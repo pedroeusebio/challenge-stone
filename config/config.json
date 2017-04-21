@@ -1,0 +1,14 @@
+{
+    "Database": {
+        "Username": "postgres",
+        "Password": "",
+        "Dbname": "challenge-stone",
+        "Hostname": "localhost",
+        "Port": "5432",
+        "Parameter" : "?sslmode=disable"
+    },
+    "Server" :{
+        "Hostname": "127.0.0.1",
+		    "HTTPPort": ":3000"
+    }
+}
