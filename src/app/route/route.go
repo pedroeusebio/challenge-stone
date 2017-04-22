@@ -3,6 +3,7 @@ package route
 import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"app/controller"
 )
 
 func LoadHTTP() http.Handler {
@@ -11,6 +12,8 @@ func LoadHTTP() http.Handler {
 
 func routes() *httprouter.Router {
 	r := httprouter.New()
+
+	r.POST("/user", controller.UserPOST)
 
 	return r
 }
