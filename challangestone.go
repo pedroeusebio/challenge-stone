@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"fmt"
 	"io/ioutil"
 	"runtime"
 	"app/shared/database"
@@ -34,7 +33,7 @@ func init() {
 }
 
 func main() {
-	 config := ParseJsonFile("config/config.json")
+	config := ParseJsonFile("config/config.json")
 
 	database.Connect(config.Database)
 
