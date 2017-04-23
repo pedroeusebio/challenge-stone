@@ -5,9 +5,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+const (
+	GtName = "6"
+	GtPassword = "6"
+)
+
 type User struct {
-	name     string `db:"name"`
-	password string `db:"password"`
+	Name     string `db:"name" validate:"required,alphanum,gt=6"`
+	Password string `db:"password"validate:"required,gt=6,excludesall= \n\t"`
 }
 
 
