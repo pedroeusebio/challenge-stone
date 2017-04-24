@@ -31,8 +31,8 @@ func validateUser(user model.User) error {
 			if err.Tag() == "required" {
 				error += err.Field() + ": is required "
 			}
-			if err.Tag() == "alphanum"|| err.Tag() == "excludesall" {
-				error += err.Field() + ": constains invalid characters "
+			if err.Tag() == "alphanum" || err.Tag() == "excludesall" {
+				error += err.Field() + ": contains invalid characters "
 			}
 			if err.Tag() == "gt" {
 				var gt string
@@ -73,7 +73,7 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		jData, _ = json.Marshal(response)
 	} else {
 		response := &Success{
-			Success: "user created",
+			Success: "user_create",
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
 	}
