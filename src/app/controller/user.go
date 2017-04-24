@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"app/model"
+	"app/shared/ordenate"
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -75,6 +76,32 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		response := &Success{
 			Success: "user_create",
 			User: []model.User{user}}
+		jData, _ = json.Marshal(response)
+	}
+	w.Write(jData)
+}
+
+
+func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	orderBy, page, length := r.FormValue("order"), r.FormValue("page"), r.FormValue("length")
+	order, err := ordenate.Order(orderBy)
+	users, err := model.GetAllUsers(order, page, length)
+	var jData []byte
+	if err != nil {
+		response := &Error {
+			Err: err.Error(),
+			User: []model.User{}}
+		jData, _ = json.Marshal(response)
+	} else if err != nil {
+		response := &Error {
+			Err: err.Error(),
+			User: []model.User{}}
+		jData, _ = json.Marshal(response)
+	} else {
+		response := &Success {
+			Success: "user_getall",
+			User: users}
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)

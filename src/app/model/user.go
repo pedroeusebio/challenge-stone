@@ -1,7 +1,9 @@
 package model
 
 import (
+	"strconv"
 	"app/shared/database"
+	"app/shared/ordenate"
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -25,3 +27,30 @@ func UserCreate(name string, password string) error {
 	return err
 }
 
+func GetAllUsers( orders []ordenate.Ordenate, page string, length string) ([]User, error) {
+	users := []User{}
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query:= psql.Select("name").From("public.\"User\"")
+	var queryStr string
+	if len(orders) > 0 {
+		for _, order := range orders {
+			query = query.OrderBy(order.Column + " " +  order.Order)
+		}
+	}
+	offset, err1 := strconv.ParseUint(page, 10, 64)
+	limit, err2 := strconv.ParseUint(length, 10, 64)
+	if err1 != nil {
+		offset = 0
+	}
+	if err2 != nil {
+		queryStr, _, _ = query.Offset(offset).ToSql()
+	} else {
+		queryStr, _, _ = query.Limit(limit).Offset(offset * limit).ToSql()
+	}
+	err := database.SQL.Select(&users, queryStr)
+	if err != nil {
+		return []User{}, err
+	} else {
+		return users, nil
+	}
+}

@@ -14,6 +14,6 @@ func routes() *httprouter.Router {
 	r := httprouter.New()
 
 	r.POST("/user", controller.UserPOST)
-
+	r.GET("/user", controller.UserGET)
 	return r
 }
