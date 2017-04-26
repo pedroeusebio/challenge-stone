@@ -27,7 +27,7 @@ func UserCreate(name string, password string) error {
 	return err
 }
 
-func GetAllUsers( orders []ordenate.Ordenate, page string, length string) ([]User, error) {
+func UserGetAll( orders []ordenate.Ordenate, page string, length string) ([]User, error) {
 	users := []User{}
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	query:= psql.Select("name").From("public.\"User\"")

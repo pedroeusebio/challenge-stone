@@ -10,7 +10,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type SucessUser struct {
+type successUser struct {
 	Success string `json: "success"`
 	User []model.User `json: "user"`
 }
@@ -73,7 +73,7 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &SucessUser {
+		response := &successUser {
 			Success: "user_create",
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
@@ -85,12 +85,12 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	orderBy, page, length := r.FormValue("order"), r.FormValue("page"), r.FormValue("length")
-	order, err := ordenate.Order(orderBy)
-	users, err := model.GetAllUsers(order, page, length)
+	order, oErr := ordenate.Order(orderBy)
+	users, err := model.UserGetAll(order, page, length)
 	var jData []byte
-	if err != nil {
+	if oErr != nil {
 		response := &errorUser {
-			Err: err.Error(),
+			Err: oErr.Error(),
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else if err != nil {
@@ -99,7 +99,7 @@ func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &SucessUser {
+		response := &successUser {
 			Success: "user_getall",
 			User: users}
 		jData, _ = json.Marshal(response)
