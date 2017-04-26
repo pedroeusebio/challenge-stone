@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"net/http"
 	"app/model"
+	"app/shared/ordenate"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/go-playground/validator.v9"
@@ -52,7 +53,7 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	document := r.FormValue("document")
 	month, err2 := strconv.Atoi(r.FormValue("month"))
 	year, err3 := strconv.Atoi(r.FormValue("year"))
-	invoice := model.Invoice{amount, document, month, year, true}
+	invoice := model.Invoice{Amount: amount,Document: document,Month: month,Year: year,Is_active: true}
 	vErr := validateInvoice(invoice)
 	ex := model.InvoiceCreate(amount, document, month, year)
 	var jData []byte
@@ -76,6 +77,37 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		response := &successInvoice{
 			Success: []string{"invoice_create"},
 			User: []model.Invoice{invoice}}
+		jData, _ = json.Marshal(response)
+	}
+	w.Write(jData)
+}
+
+func InvoiceGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	orderBy, page, length := r.FormValue("order"), r.FormValue("page"), r.FormValue("length")
+	var order []ordenate.Ordenate
+	var oErr error
+	if len(orderBy) > 0 {
+		order, oErr = ordenate.Order(orderBy)
+	} else {
+		order, oErr = []ordenate.Ordenate{}, nil
+	}
+	users, err := model.InvoiceGetAll(order, page, length)
+	var jData []byte
+	if oErr != nil {
+		response := &errorInvoice {
+			Err: []string{oErr.Error()},
+			User: []model.Invoice{}}
+		jData, _ = json.Marshal(response)
+	} else if err != nil {
+		response := &errorInvoice {
+			Err: []string{err.Error()},
+			User: []model.Invoice{}}
+		jData, _ = json.Marshal(response)
+	} else {
+		response := &successInvoice {
+			Success: []string{"invoice_getall"},
+			User: users}
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)
