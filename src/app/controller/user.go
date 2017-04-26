@@ -10,12 +10,12 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-type Success struct {
+type SucessUser struct {
 	Success string `json: "success"`
 	User []model.User `json: "user"`
 }
 
-type Error struct {
+type errorUser struct {
 	Err string `json: "error"`
 	User []model.User `json: "user"`
 }
@@ -62,18 +62,18 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var jData []byte
 	if vErr != nil {
 		e := vErr.Error()
-		response := &Error {
+		response := &errorUser {
 			Err: e,
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
 	} else if ex != nil {
 		s := ex.Error()
-		response := &Error{
+		response := &errorUser {
 			Err: s,
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &Success{
+		response := &SucessUser {
 			Success: "user_create",
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
@@ -89,17 +89,17 @@ func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := model.GetAllUsers(order, page, length)
 	var jData []byte
 	if err != nil {
-		response := &Error {
+		response := &errorUser {
 			Err: err.Error(),
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else if err != nil {
-		response := &Error {
+		response := &errorUser {
 			Err: err.Error(),
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &Success {
+		response := &SucessUser {
 			Success: "user_getall",
 			User: users}
 		jData, _ = json.Marshal(response)
