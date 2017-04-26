@@ -85,7 +85,13 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	orderBy, page, length := r.FormValue("order"), r.FormValue("page"), r.FormValue("length")
-	order, oErr := ordenate.Order(orderBy)
+	var order []ordenate.Ordenate
+	var oErr error
+	if len(orderBy) > 0 {
+		order, oErr = ordenate.Order(orderBy)
+	} else {
+		order, oErr = []ordenate.Ordenate{}, nil
+	}
 	users, err := model.UserGetAll(order, page, length)
 	var jData []byte
 	if oErr != nil {
