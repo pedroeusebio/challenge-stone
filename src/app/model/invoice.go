@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"strconv"
 	"app/shared/database"
 	"app/shared/ordenate"
@@ -67,15 +66,11 @@ func InvoiceDelete(id string) (Invoice, error) {
 	var invoice Invoice
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	qGet, _, _ := psql.Select("*").From("public.\"Invoice\"").Where(sq.Eq{"id": id}).ToSql()
-	fmt.Println(qGet)
 	err1 := database.SQL.Get(&invoice, qGet, id)
-	fmt.Println(invoice)
 	if err1 != nil {
-		fmt.Println(err1)
 		return invoice, err1
 	}
 	query, _, _:= psql.Update("public.\"Invoice\"").Set("is_active", false).Where(sq.Eq{"id": id}).ToSql()
-	fmt.Println(query)
 	_, err = database.SQL.Exec(query, false, id)
 	return invoice, err
 }
