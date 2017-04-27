@@ -12,12 +12,12 @@ import (
 
 type successInvoice struct {
 	Success []string `json: "success"`
-	User []model.Invoice `json: "invoice"`
+	Invoice []model.Invoice `json: "invoice"`
 }
 
 type errorInvoice struct {
 	Err []string `json: "error"`
-	User []model.Invoice `json: "invoice"`
+	Invoice []model.Invoice `json: "invoice"`
 }
 
 
@@ -60,23 +60,23 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if err1 != nil || err2 != nil || err3 != nil {
 		response := &errorInvoice{
 			Err: []string{"error while parsing values"},
-			User: []model.Invoice{invoice}}
+			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else if len(vErr) > 0 {
 		response := &errorInvoice {
 			Err: vErr,
-			User: []model.Invoice{invoice}}
+			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else if ex != nil {
 		s := ex.Error()
 		response := &errorInvoice{
 			Err: []string{s},
-			User: []model.Invoice{invoice}}
+			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else {
 		response := &successInvoice{
 			Success: []string{"invoice_create"},
-			User: []model.Invoice{invoice}}
+			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)
@@ -97,17 +97,38 @@ func InvoiceGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if oErr != nil {
 		response := &errorInvoice {
 			Err: []string{oErr.Error()},
-			User: []model.Invoice{}}
+			Invoice: []model.Invoice{}}
 		jData, _ = json.Marshal(response)
 	} else if err != nil {
 		response := &errorInvoice {
 			Err: []string{err.Error()},
-			User: []model.Invoice{}}
+			Invoice: []model.Invoice{}}
 		jData, _ = json.Marshal(response)
 	} else {
 		response := &successInvoice {
 			Success: []string{"invoice_getall"},
-			User: users}
+			Invoice: users}
+		jData, _ = json.Marshal(response)
+	}
+	w.Write(jData)
+}
+
+func InvoiceDEL(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	id := params.ByName("id")
+	invoice, ex := model.InvoiceDelete(id)
+	invoice.Is_active = false
+	var jData []byte
+	if ex != nil {
+		s := ex.Error()
+		response := &errorInvoice {
+			Err: []string{s},
+			Invoice: []model.Invoice{invoice}}
+		jData, _ = json.Marshal(response)
+	} else {
+		response := &successInvoice {
+			Success: []string{"invoice_delete"},
+			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)

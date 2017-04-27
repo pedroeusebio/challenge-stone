@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"app/shared/database"
 	"app/shared/ordenate"
@@ -15,7 +16,7 @@ const (
 )
 
 type Invoice struct {
-	Id uint64 `db:"id"`
+	Id string `db:"id"`
 	Amount float64 `db:"amount" validate:"gte=0"`
 	Document string `db:"document" validate:"required"`
 	Month int `db:"month" validate:"gte=1,lte=12"`
@@ -59,4 +60,22 @@ func InvoiceGetAll( orders []ordenate.Ordenate, page string, length string) ([]I
 	} else {
 		return invoices, nil
 	}
+}
+
+func InvoiceDelete(id string) (Invoice, error) {
+	var err error
+	var invoice Invoice
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	qGet, _, _ := psql.Select("*").From("public.\"Invoice\"").Where(sq.Eq{"id": id}).ToSql()
+	fmt.Println(qGet)
+	err1 := database.SQL.Get(&invoice, qGet, id)
+	fmt.Println(invoice)
+	if err1 != nil {
+		fmt.Println(err1)
+		return invoice, err1
+	}
+	query, _, _:= psql.Update("public.\"Invoice\"").Set("is_active", false).Where(sq.Eq{"id": id}).ToSql()
+	fmt.Println(query)
+	_, err = database.SQL.Exec(query, false, id)
+	return invoice, err
 }
