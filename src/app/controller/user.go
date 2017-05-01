@@ -11,13 +11,13 @@ import (
 )
 
 type successUser struct {
-	Success string `json: "success"`
-	User []model.User `json: "user"`
+	Success string `json:"success"`
+	User []model.User `json:"user"`
 }
 
 type errorUser struct {
-	Err string `json: "error"`
-	User []model.User `json: "user"`
+	Err string `json:"error"`
+	User []model.User `json:"user"`
 }
 
 var validate *validator.Validate

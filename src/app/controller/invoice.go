@@ -11,13 +11,13 @@ import (
 )
 
 type successInvoice struct {
-	Success []string `json: "success"`
-	Invoice []model.Invoice `json: "invoice"`
+	Success []string `json:"success"`
+	Invoice []model.Invoice `json:"invoice"`
 }
 
 type errorInvoice struct {
-	Err []string `json: "error"`
-	Invoice []model.Invoice `json: "invoice"`
+	Err []string `json:"error"`
+	Invoice []model.Invoice `json:"invoice"`
 }
 
 
