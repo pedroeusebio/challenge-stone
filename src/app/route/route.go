@@ -1,9 +1,10 @@
 package route
 
 import (
-	"net/http"
-	"github.com/julienschmidt/httprouter"
 	"app/controller"
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func LoadHTTP() http.Handler {

@@ -1,14 +1,15 @@
 package database
 
 import (
-	"github.com/jmoiron/sqlx"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 var (
 	database Database
-	SQL *sqlx.DB
+	SQL      *sqlx.DB
 )
 
 type Database struct {

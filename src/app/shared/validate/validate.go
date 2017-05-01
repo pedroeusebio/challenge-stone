@@ -1,8 +1,8 @@
 package validate
 
 import (
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func ValidateCPF(document string) string {
@@ -22,7 +22,7 @@ func ValidateCPF(document string) string {
 	if (testD1*10)%11 == d1 && (testD2*10)%11 == d2 && !eq {
 		return ""
 	} else {
-		return  "CPF invalid"
+		return "CPF invalid"
 	}
 }
 

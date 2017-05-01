@@ -1,23 +1,24 @@
 package controller
 
 import (
-	"strconv"
-	"net/http"
 	"app/model"
 	"app/shared/ordenate"
 	v "app/shared/validate"
 	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/go-playground/validator.v9"
 )
 
 type successInvoice struct {
-	Success []string `json:"success"`
+	Success []string        `json:"success"`
 	Invoice []model.Invoice `json:"payload"`
 }
 
 type errorInvoice struct {
-	Err []string `json:"error"`
+	Err     []string        `json:"error"`
 	Invoice []model.Invoice `json:"payload"`
 }
 
@@ -28,7 +29,7 @@ func validateInvoice(invoice model.Invoice) []string {
 		for _, err := range Err.(validator.ValidationErrors) {
 			switch tag := err.Tag(); tag {
 			case "required":
-				error = append(error, err.Field() + ": is required ")
+				error = append(error, err.Field()+": is required ")
 			case "gte":
 				var gte string
 				switch field := err.Field(); field {
@@ -37,15 +38,15 @@ func validateInvoice(invoice model.Invoice) []string {
 				case "Month":
 					gte = model.GteMonth
 				}
-				error = append(error, err.Field() + ": must be greater than or equals to " + gte + " ")
+				error = append(error, err.Field()+": must be greater than or equals to "+gte+" ")
 			case "gt":
-				error = append(error, err.Field() + ": must be greater than " + model.GtYear + " ")
+				error = append(error, err.Field()+": must be greater than "+model.GtYear+" ")
 			case "lte":
-				error = append(error, err.Field() + ": must be less than or equals to " + model.LteMonth + " ")
+				error = append(error, err.Field()+": must be less than or equals to "+model.LteMonth+" ")
 			case "numeric":
-				error = append(error, err.Field() + ": must be only numbers")
-			case "len=11|len=14" :
-				error = append(error, err.Field() + ": must have " + model.GteDocument + " or " + model.LteDocument + " digits")
+				error = append(error, err.Field()+": must be only numbers")
+			case "len=11|len=14":
+				error = append(error, err.Field()+": must have "+model.GteDocument+" or "+model.LteDocument+" digits")
 			}
 		}
 	} else {
@@ -56,7 +57,7 @@ func validateInvoice(invoice model.Invoice) []string {
 			dErr = v.ValidateCNPJ(invoice.Document)
 		}
 		if len(dErr) > 0 {
-			error = append(error, "Document: " + dErr)
+			error = append(error, "Document: "+dErr)
 		}
 	}
 	return error
@@ -69,17 +70,17 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	document := r.FormValue("document")
 	month, err2 := strconv.Atoi(r.FormValue("month"))
 	year, err3 := strconv.Atoi(r.FormValue("year"))
-	invoice := model.Invoice{Amount: amount,Document: document,Month: month,Year: year,Is_active: true}
+	invoice := model.Invoice{Amount: amount, Document: document, Month: month, Year: year, Is_active: true}
 	vErr := validateInvoice(invoice)
 	var jData []byte
 	if err1 != nil || err2 != nil || err3 != nil {
 		response := &errorInvoice{
-			Err: []string{"error while parsing values"},
+			Err:     []string{"error while parsing values"},
 			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else if len(vErr) > 0 {
-		response := &errorInvoice {
-			Err: vErr,
+		response := &errorInvoice{
+			Err:     vErr,
 			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else {
@@ -87,7 +88,7 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		if ex != nil {
 			s := ex.Error()
 			response := &errorInvoice{
-				Err: []string{s},
+				Err:     []string{s},
 				Invoice: []model.Invoice{invoice}}
 			jData, _ = json.Marshal(response)
 		} else {
@@ -96,7 +97,7 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				Invoice: []model.Invoice{invoice}}
 			jData, _ = json.Marshal(response)
 		}
-}
+	}
 	w.Write(jData)
 }
 
@@ -113,17 +114,17 @@ func InvoiceGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := model.InvoiceGetAll(order, page, length)
 	var jData []byte
 	if oErr != nil {
-		response := &errorInvoice {
-			Err: []string{oErr.Error()},
+		response := &errorInvoice{
+			Err:     []string{oErr.Error()},
 			Invoice: []model.Invoice{}}
 		jData, _ = json.Marshal(response)
 	} else if err != nil {
-		response := &errorInvoice {
-			Err: []string{err.Error()},
+		response := &errorInvoice{
+			Err:     []string{err.Error()},
 			Invoice: []model.Invoice{}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &successInvoice {
+		response := &successInvoice{
 			Success: []string{"invoice_getall"},
 			Invoice: users}
 		jData, _ = json.Marshal(response)
@@ -139,12 +140,12 @@ func InvoiceDEL(w http.ResponseWriter, r *http.Request, params httprouter.Params
 	var jData []byte
 	if ex != nil {
 		s := ex.Error()
-		response := &errorInvoice {
-			Err: []string{s},
+		response := &errorInvoice{
+			Err:     []string{s},
 			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &successInvoice {
+		response := &successInvoice{
 			Success: []string{"invoice_delete"},
 			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)

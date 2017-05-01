@@ -1,19 +1,19 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"os"
-	"io/ioutil"
-	"runtime"
+	"app/route"
 	"app/shared/database"
 	"app/shared/server"
-	"app/route"
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
+	"runtime"
 )
 
 type configuration struct {
 	Database database.Database `json:"Database"`
-	Server   server.Server `json:"Server"`
+	Server   server.Server     `json:"Server"`
 }
 
 func ParseJsonFile(configPath string) configuration {

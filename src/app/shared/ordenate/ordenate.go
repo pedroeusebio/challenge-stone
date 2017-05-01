@@ -1,18 +1,18 @@
 package ordenate
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
-	"encoding/json"
 )
 
 type Ordenate struct {
 	Column string `json:"Column"`
-	Order string `json:"Order"`
+	Order  string `json:"Order"`
 }
 
-func Order (order string) ([]Ordenate, error) {
-	ordenate := []Ordenate{};
+func Order(order string) ([]Ordenate, error) {
+	ordenate := []Ordenate{}
 	dec := json.NewDecoder(strings.NewReader(order))
 	_, err := dec.Token()
 	if err != nil {
@@ -28,5 +28,5 @@ func Order (order string) ([]Ordenate, error) {
 			ordenate = append(ordenate, o)
 		}
 	}
-	return ordenate, nil;
+	return ordenate, nil
 }

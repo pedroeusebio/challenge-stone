@@ -1,27 +1,27 @@
 package controller
 
 import (
-	"errors"
-	"encoding/json"
-	"net/http"
 	"app/model"
 	"app/shared/ordenate"
+	"encoding/json"
+	"errors"
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/go-playground/validator.v9"
 )
 
 type successUser struct {
-	Success string `json:"success"`
-	User []model.User `json:"payload"`
+	Success string       `json:"success"`
+	User    []model.User `json:"payload"`
 }
 
 type errorUser struct {
-	Err string `json:"error"`
+	Err  string       `json:"error"`
 	User []model.User `json:"payload"`
 }
 
 var validate *validator.Validate
-
 
 func validateUser(user model.User) error {
 	var error string
@@ -61,28 +61,27 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var jData []byte
 	if vErr != nil {
 		e := vErr.Error()
-		response := &errorUser {
-			Err: e,
+		response := &errorUser{
+			Err:  e,
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
 	} else {
 		ex := model.UserCreate(name, password)
 		if ex != nil {
 			s := ex.Error()
-			response := &errorUser {
-				Err: s,
+			response := &errorUser{
+				Err:  s,
 				User: []model.User{user}}
 			jData, _ = json.Marshal(response)
 		} else {
-			response := &successUser {
+			response := &successUser{
 				Success: "user_create",
-				User: []model.User{user}}
+				User:    []model.User{user}}
 			jData, _ = json.Marshal(response)
 		}
 	}
 	w.Write(jData)
 }
-
 
 func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
@@ -97,19 +96,19 @@ func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := model.UserGetAll(order, page, length)
 	var jData []byte
 	if oErr != nil {
-		response := &errorUser {
-			Err: oErr.Error(),
+		response := &errorUser{
+			Err:  oErr.Error(),
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else if err != nil {
-		response := &errorUser {
-			Err: err.Error(),
+		response := &errorUser{
+			Err:  err.Error(),
 			User: []model.User{}}
 		jData, _ = json.Marshal(response)
 	} else {
-		response := &successUser {
+		response := &successUser{
 			Success: "user_getall",
-			User: users}
+			User:    users}
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)

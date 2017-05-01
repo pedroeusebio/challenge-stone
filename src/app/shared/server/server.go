@@ -1,9 +1,9 @@
 package server
 
 import (
-	"net/http"
 	"fmt"
 	"log"
+	"net/http"
 )
 
 type Server struct {

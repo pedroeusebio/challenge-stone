@@ -1,14 +1,15 @@
 package controller
 
 import (
-	"time"
-	"errors"
+	"app/model"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
-	"app/model"
-	"github.com/julienschmidt/httprouter"
+	"time"
+
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/julienschmidt/httprouter"
 )
 
 type Claims struct {
@@ -18,7 +19,7 @@ type Claims struct {
 
 type successLogin struct {
 	Success string `json:"success"`
-	Token string `json:"token"`
+	Token   string `json:"token"`
 }
 
 type errorLogin struct {
@@ -36,31 +37,31 @@ func AuthPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	user, gErr := model.UserByName(name)
 	var jData []byte
 	if gErr != nil {
-		response := &errorLogin {
+		response := &errorLogin{
 			Error: gErr.Error(),
 			Token: ""}
 		jData, _ = json.Marshal(response)
 	} else if user.Password == password {
-		claims := Claims {
+		claims := Claims{
 			user,
-			jwt.StandardClaims {
+			jwt.StandardClaims{
 				ExpiresAt: time.Now().Add(time.Hour * 24 * 365 * 10).Unix(),
-				Issuer: "localhost:3000"}}
-		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"),claims)
+				Issuer:    "localhost:3000"}}
+		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
 		tokenString, tErr := token.SignedString([]byte(mySigningKey))
 		if tErr != nil {
-			response := &errorLogin {
+			response := &errorLogin{
 				Error: tErr.Error(),
 				Token: ""}
 			jData, _ = json.Marshal(response)
 		} else {
-			response := &successLogin {
+			response := &successLogin{
 				Success: "user authenticated",
-				Token: tokenString}
+				Token:   tokenString}
 			jData, _ = json.Marshal(response)
 		}
 	} else {
-		response := &errorLogin {
+		response := &errorLogin{
 			Error: "invalid password",
 			Token: ""}
 		jData, _ = json.Marshal(response)
@@ -73,7 +74,7 @@ func Validate(protectedPage httprouter.Handle) httprouter.Handle {
 		var jData []byte
 		xtoken := r.Header.Get("X-Token")
 		if len(xtoken) <= 0 {
-			response := &errorLogin {
+			response := &errorLogin{
 				Error: "user not validated",
 				Token: xtoken}
 			jData, _ = json.Marshal(response)
@@ -82,14 +83,14 @@ func Validate(protectedPage httprouter.Handle) httprouter.Handle {
 			return
 		}
 
-		token, err := jwt.ParseWithClaims(xtoken, &Claims{}, func(token *jwt.Token) (interface{}, error){
+		token, err := jwt.ParseWithClaims(xtoken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("Unexpected siging method")
 			}
 			return []byte(mySigningKey), nil
 		})
 		if err != nil {
-			response := &errorLogin {
+			response := &errorLogin{
 				Error: err.Error(),
 				Token: xtoken}
 			jData, _ = json.Marshal(response)

@@ -1,15 +1,16 @@
 package model
 
 import (
-	"fmt"
-	"strconv"
 	"app/shared/database"
 	"app/shared/ordenate"
+	"fmt"
+	"strconv"
+
 	sq "github.com/Masterminds/squirrel"
 )
 
 const (
-	GtName = "6"
+	GtName     = "6"
 	GtPassword = "6"
 )
 
@@ -17,7 +18,6 @@ type User struct {
 	Name     string `db:"name" validate:"required,alphanum,gt=6" json:"name"`
 	Password string `db:"password" validate:"required,gt=6,excludesall= \n\t" json:"password"`
 }
-
 
 func UserCreate(name string, password string) error {
 	var err error
@@ -28,14 +28,14 @@ func UserCreate(name string, password string) error {
 	return err
 }
 
-func UserGetAll( orders []ordenate.Ordenate, page string, length string) ([]User, error) {
+func UserGetAll(orders []ordenate.Ordenate, page string, length string) ([]User, error) {
 	users := []User{}
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
-	query:= psql.Select("name").From("public.\"User\"")
+	query := psql.Select("name").From("public.\"User\"")
 	var queryStr string
 	if len(orders) > 0 {
 		for _, order := range orders {
-			query = query.OrderBy(order.Column + " " +  order.Order)
+			query = query.OrderBy(order.Column + " " + order.Order)
 		}
 	}
 	offset, err1 := strconv.ParseUint(page, 10, 64)
@@ -56,7 +56,7 @@ func UserGetAll( orders []ordenate.Ordenate, page string, length string) ([]User
 	}
 }
 
-func UserByName( name string) (User, error) {
+func UserByName(name string) (User, error) {
 	user := User{}
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	query, _, _ := psql.Select("*").From("public.\"User\"").Where(sq.Eq{"name": name}).ToSql()
