@@ -3,7 +3,7 @@ package model
 import (
 	"app/shared/database"
 	"app/shared/ordenate"
-	"fmt"
+	"errors"
 	"strconv"
 
 	sq "github.com/Masterminds/squirrel"
@@ -28,8 +28,9 @@ func UserCreate(name string, password string) error {
 	return err
 }
 
-func UserGetAll(orders []ordenate.Ordenate, page string, length string) ([]User, error) {
+func UserGetAll(orders []ordenate.Ordenate, page string, length string, name string) ([]User, error) {
 	users := []User{}
+	err := errors.New("")
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	query := psql.Select("name").From("public.\"User\"")
 	var queryStr string
@@ -44,11 +45,17 @@ func UserGetAll(orders []ordenate.Ordenate, page string, length string) ([]User,
 		offset = 0
 	}
 	if err2 != nil {
-		queryStr, _, _ = query.Offset(offset).ToSql()
+		query = query.Offset(offset)
 	} else {
-		queryStr, _, _ = query.Limit(limit).Offset(offset * limit).ToSql()
+		query = query.Limit(limit).Offset(offset * limit)
 	}
-	err := database.SQL.Select(&users, queryStr)
+	if len(name) > 0 {
+		queryStr, _, _ = query.Where("name ILIKE ? ", name).ToSql()
+		err = database.SQL.Select(&users, queryStr, "%"+name+"%")
+	} else {
+		queryStr, _, _ = query.ToSql()
+		err = database.SQL.Select(&users, queryStr)
+	}
 	if err != nil {
 		return []User{}, err
 	} else {
@@ -61,7 +68,6 @@ func UserByName(name string) (User, error) {
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	query, _, _ := psql.Select("*").From("public.\"User\"").Where(sq.Eq{"name": name}).ToSql()
 	err := database.SQL.Get(&user, query, name)
-	fmt.Println(err)
 	if err != nil {
 		return User{}, err
 	} else {
