@@ -2,6 +2,8 @@ package controller
 
 import (
 	"time"
+	"errors"
+	"context"
 	"encoding/json"
 	"net/http"
 	"app/model"
@@ -10,7 +12,7 @@ import (
 )
 
 type Claims struct {
-	Username string `json:"username"`
+	User model.User `json:"user"`
 	jwt.StandardClaims
 }
 
@@ -40,7 +42,7 @@ func AuthPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		jData, _ = json.Marshal(response)
 	} else if user.Password == password {
 		claims := Claims {
-			user.Name + user.Password,
+			user,
 			jwt.StandardClaims {
 				ExpiresAt: time.Now().Add(time.Hour * 24 * 365 * 10).Unix(),
 				Issuer: "localhost:3000"}}
@@ -64,4 +66,44 @@ func AuthPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		jData, _ = json.Marshal(response)
 	}
 	w.Write(jData)
+}
+
+func Validate(protectedPage httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		var jData []byte
+		xtoken := r.Header.Get("X-Token")
+		if len(xtoken) <= 0 {
+			response := &errorLogin {
+				Error: "user not validated",
+				Token: xtoken}
+			jData, _ = json.Marshal(response)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jData)
+			return
+		}
+
+		token, err := jwt.ParseWithClaims(xtoken, &Claims{}, func(token *jwt.Token) (interface{}, error){
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("Unexpected siging method")
+			}
+			return []byte(mySigningKey), nil
+		})
+		if err != nil {
+			response := &errorLogin {
+				Error: err.Error(),
+				Token: xtoken}
+			jData, _ = json.Marshal(response)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jData)
+			return
+		}
+
+		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+			ctx := context.WithValue(r.Context(), mySigningKey, *claims)
+			protectedPage(w, r.WithContext(ctx), p)
+		} else {
+			http.NotFound(w, r)
+			return
+		}
+	}
 }

@@ -16,9 +16,9 @@ func routes() *httprouter.Router {
 	r.POST("/user", controller.UserPOST)
 	r.GET("/user", controller.UserGET)
 
-	r.POST("/invoice", controller.InvoicePOST)
+	r.POST("/invoice", controller.Validate(controller.InvoicePOST))
 	r.GET("/invoice", controller.InvoiceGET)
-	r.DELETE("/invoice/:id", controller.InvoiceDEL)
+	r.DELETE("/invoice/:id", controller.Validate(controller.InvoiceDEL))
 
 	r.POST("/login", controller.AuthPOST)
 	return r
