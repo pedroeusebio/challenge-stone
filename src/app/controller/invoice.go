@@ -55,7 +55,6 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	year, err3 := strconv.Atoi(r.FormValue("year"))
 	invoice := model.Invoice{Amount: amount,Document: document,Month: month,Year: year,Is_active: true}
 	vErr := validateInvoice(invoice)
-	ex := model.InvoiceCreate(amount, document, month, year)
 	var jData []byte
 	if err1 != nil || err2 != nil || err3 != nil {
 		response := &errorInvoice{
@@ -67,18 +66,21 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			Err: vErr,
 			Invoice: []model.Invoice{invoice}}
 		jData, _ = json.Marshal(response)
-	} else if ex != nil {
-		s := ex.Error()
-		response := &errorInvoice{
-			Err: []string{s},
-			Invoice: []model.Invoice{invoice}}
-		jData, _ = json.Marshal(response)
 	} else {
-		response := &successInvoice{
-			Success: []string{"invoice_create"},
-			Invoice: []model.Invoice{invoice}}
-		jData, _ = json.Marshal(response)
-	}
+		ex := model.InvoiceCreate(amount, document, month, year)
+		if ex != nil {
+			s := ex.Error()
+			response := &errorInvoice{
+				Err: []string{s},
+				Invoice: []model.Invoice{invoice}}
+			jData, _ = json.Marshal(response)
+		} else {
+			response := &successInvoice{
+				Success: []string{"invoice_create"},
+				Invoice: []model.Invoice{invoice}}
+			jData, _ = json.Marshal(response)
+		}
+}
 	w.Write(jData)
 }
 

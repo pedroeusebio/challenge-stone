@@ -58,7 +58,6 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	name, password := r.FormValue("name"), r.FormValue("password")
 	user := model.User{name, password}
 	vErr := validateUser(user)
-	ex := model.UserCreate(name, password)
 	var jData []byte
 	if vErr != nil {
 		e := vErr.Error()
@@ -66,17 +65,20 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			Err: e,
 			User: []model.User{user}}
 		jData, _ = json.Marshal(response)
-	} else if ex != nil {
-		s := ex.Error()
-		response := &errorUser {
-			Err: s,
-			User: []model.User{user}}
-		jData, _ = json.Marshal(response)
 	} else {
-		response := &successUser {
-			Success: "user_create",
-			User: []model.User{user}}
-		jData, _ = json.Marshal(response)
+		ex := model.UserCreate(name, password)
+		if ex != nil {
+			s := ex.Error()
+			response := &errorUser {
+				Err: s,
+				User: []model.User{user}}
+			jData, _ = json.Marshal(response)
+		} else {
+			response := &successUser {
+				Success: "user_create",
+				User: []model.User{user}}
+			jData, _ = json.Marshal(response)
+		}
 	}
 	w.Write(jData)
 }
