@@ -33,7 +33,7 @@ func init() {
 }
 
 func main() {
-	config := ParseJsonFile("config/config.json")
+	config := ParseJsonFile("../config/config.json")
 
 	database.Connect(config.Database)
 

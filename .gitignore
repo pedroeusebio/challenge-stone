@@ -3,6 +3,7 @@
 *.a
 *.so
 
+src/vendor/*
 # Folders
 _obj
 _test
