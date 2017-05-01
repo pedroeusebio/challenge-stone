@@ -25,3 +25,6 @@
 [submodule "src/github.com/go-playground/locales"]
 	path = src/github.com/go-playground/locales
 	url = https://github.com/go-playground/locales
+[submodule "src/github.com/dgrijalva/jwt-go"]
+	path = src/github.com/dgrijalva/jwt-go
+	url = https://github.com/dgrijalva/jwt-go

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 	"app/shared/database"
 	"app/shared/ordenate"
@@ -53,4 +54,18 @@ func UserGetAll( orders []ordenate.Ordenate, page string, length string) ([]User
 	} else {
 		return users, nil
 	}
+}
+
+func UserByName( name string) (User, error) {
+	user := User{}
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query, _, _ := psql.Select("*").From("public.\"User\"").Where(sq.Eq{"name": name}).ToSql()
+	err := database.SQL.Get(&user, query, name)
+	fmt.Println(err)
+	if err != nil {
+		return User{}, err
+	} else {
+		return user, nil
+	}
+
 }

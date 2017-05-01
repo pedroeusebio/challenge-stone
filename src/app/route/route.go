@@ -19,5 +19,7 @@ func routes() *httprouter.Router {
 	r.POST("/invoice", controller.InvoicePOST)
 	r.GET("/invoice", controller.InvoiceGET)
 	r.DELETE("/invoice/:id", controller.InvoiceDEL)
+
+	r.POST("/login", controller.AuthPOST)
 	return r
 }
