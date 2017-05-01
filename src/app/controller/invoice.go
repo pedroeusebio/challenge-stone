@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"app/model"
 	"app/shared/ordenate"
+	v "app/shared/validate"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/go-playground/validator.v9"
@@ -20,27 +21,42 @@ type errorInvoice struct {
 	Invoice []model.Invoice `json:"payload"`
 }
 
-
-
 func validateInvoice(invoice model.Invoice) []string {
 	error := []string{}
 	Err := validate.Struct(invoice)
 	if Err != nil {
 		for _, err := range Err.(validator.ValidationErrors) {
-			if err.Tag() == "required" {
+			switch tag := err.Tag(); tag {
+			case "required":
 				error = append(error, err.Field() + ": is required ")
-			}
-			if err.Tag() == "gte" {
+			case "gte":
 				var gte string
-				if err.Field() == "Amount" {gte = model.GteAmount} else {gte = model.GteMonth}
+				switch field := err.Field(); field {
+				case "Amount":
+					gte = model.GteAmount
+				case "Month":
+					gte = model.GteMonth
+				}
 				error = append(error, err.Field() + ": must be greater than or equals to " + gte + " ")
-			}
-			if err.Tag() == "gt" {
+			case "gt":
 				error = append(error, err.Field() + ": must be greater than " + model.GtYear + " ")
-			}
-			if err.Tag() == "lte" {
+			case "lte":
 				error = append(error, err.Field() + ": must be less than or equals to " + model.LteMonth + " ")
+			case "numeric":
+				error = append(error, err.Field() + ": must be only numbers")
+			case "len=11|len=14" :
+				error = append(error, err.Field() + ": must have " + model.GteDocument + " or " + model.LteDocument + " digits")
 			}
+		}
+	} else {
+		var dErr string
+		if len(invoice.Document) == 11 {
+			dErr = v.ValidateCPF(invoice.Document)
+		} else {
+			dErr = v.ValidateCNPJ(invoice.Document)
+		}
+		if len(dErr) > 0 {
+			error = append(error, "Document: " + dErr)
 		}
 	}
 	return error

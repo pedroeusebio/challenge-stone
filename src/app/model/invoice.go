@@ -9,15 +9,17 @@ import (
 
 const (
 	GteAmount = "0"
-	GtYear = "0"
 	GteMonth = "1"
+	GteDocument = "11"
+	GtYear = "0"
 	LteMonth = "12"
+	LteDocument = "14"
 )
 
 type Invoice struct {
 	Id string `db:"id" json:"id"`
 	Amount float64 `db:"amount" validate:"gte=0" json:"amount"`
-	Document string `db:"document" validate:"required" json:"document"`
+	Document string `db:"document" validate:"required,numeric,len=11|len=14" json:"document"`
 	Month int `db:"month" validate:"gte=1,lte=12" json:"month"`
 	Year int `db:"year" validate:"gt=1" json:"year"`
 	Is_active bool `db:"is_active" validate:"required" json:"is_active"`
