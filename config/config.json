@@ -1,8 +1,8 @@
 {
     "Database": {
-        "Username": "postgres",
-        "Password": "",
-        "Dbname": "challenge-stone",
+        "Username": "docker",
+        "Password": "docker",
+        "Dbname": "docker",
         "Hostname": "localhost",
         "Port": "5432",
         "Parameter" : "?sslmode=disable"
