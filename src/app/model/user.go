@@ -14,8 +14,8 @@ const (
 )
 
 type User struct {
-	Name     string `db:"name" validate:"required,alphanum,gt=6"`
-	Password string `db:"password" validate:"required,gt=6,excludesall= \n\t"`
+	Name     string `db:"name" validate:"required,alphanum,gt=6" json:"name"`
+	Password string `db:"password" validate:"required,gt=6,excludesall= \n\t" json:"password"`
 }
 
 

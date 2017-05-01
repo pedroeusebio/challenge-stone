@@ -15,12 +15,12 @@ const (
 )
 
 type Invoice struct {
-	Id string `db:"id"`
-	Amount float64 `db:"amount" validate:"gte=0"`
-	Document string `db:"document" validate:"required"`
-	Month int `db:"month" validate:"gte=1,lte=12"`
-	Year int `db:"year" validate:"gt=1"`
-	Is_active bool `db:"is_active" validate:"required"`
+	Id string `db:"id" json:"id"`
+	Amount float64 `db:"amount" validate:"gte=0" json:"amount"`
+	Document string `db:"document" validate:"required" json:"document"`
+	Month int `db:"month" validate:"gte=1,lte=12" json:"month"`
+	Year int `db:"year" validate:"gt=1" json:"year"`
+	Is_active bool `db:"is_active" validate:"required" json:"is_active"`
 }
 
 
