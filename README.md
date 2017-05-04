@@ -3,9 +3,9 @@
 
 ## Indice
 
-- [Instalação](https://github.com/pedroeusebio/challenge-stone#instalacao)
+- [Instalação](https://github.com/pedroeusebio/challenge-stone#instalação)
 - [Bibliotecas](https://github.com/pedroeusebio/challenge-stone#bibliotecas)
-- [Documentação da API](https://github.com/pedroeusebio/challenge-stone#documentacao-da-api)
+- [Documentação da API](https://github.com/pedroeusebio/challenge-stone#documentação-da-api)
 - [Referências](https://github.com/pedroeusebio/challenge-stone#referencias) 
 
 ## Instalação 
