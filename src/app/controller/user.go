@@ -3,12 +3,11 @@ package controller
 import (
 	"app/model"
 	"app/shared/ordenate"
+	v "app/shared/validate"
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type successUser struct {
@@ -21,45 +20,11 @@ type errorUser struct {
 	User []model.User `json:"payload"`
 }
 
-var validate *validator.Validate
-
-func ValidateUser(user model.User) error {
-	var error string
-	vErr := validate.Struct(user)
-	if vErr != nil {
-		for _, err := range vErr.(validator.ValidationErrors) {
-			if len(error) > 0 {
-				error += ", "
-			}
-			if err.Tag() == "required" {
-				error += err.Field() + ": is required "
-			}
-			if err.Tag() == "alphanum" || err.Tag() == "excludesall" {
-				error += err.Field() + ": contains invalid characters "
-			}
-			if err.Tag() == "gt" {
-				var gt string
-				if err.Field() == "Name" {
-					gt = model.GtName
-				} else {
-					gt = model.GtPassword
-				}
-				error += err.Field() + ": must have more than " + gt + " characters"
-			}
-		}
-		rErr := errors.New(error)
-		return rErr
-	} else {
-		return nil
-	}
-}
-
 func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	validate = validator.New()
 	w.Header().Set("Content-Type", "application/json")
 	name, password := r.FormValue("name"), r.FormValue("password")
 	user := model.User{name, password}
-	vErr := ValidateUser(user)
+	vErr := v.ValidateUser(user)
 	var jData []byte
 	if vErr != nil {
 		e := vErr.Error()

@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type successInvoice struct {
@@ -22,56 +21,14 @@ type errorInvoice struct {
 	Invoice []model.Invoice `json:"payload"`
 }
 
-func ValidateInvoice(invoice model.Invoice) []string {
-	error := []string{}
-	Err := validate.Struct(invoice)
-	if Err != nil {
-		for _, err := range Err.(validator.ValidationErrors) {
-			switch tag := err.Tag(); tag {
-			case "required":
-				error = append(error, err.Field()+": is required ")
-			case "gte":
-				var gte string
-				switch field := err.Field(); field {
-				case "Amount":
-					gte = model.GteAmount
-				case "Month":
-					gte = model.GteMonth
-				}
-				error = append(error, err.Field()+": must be greater than or equals to "+gte+" ")
-			case "gt":
-				error = append(error, err.Field()+": must be greater than "+model.GtYear+" ")
-			case "lte":
-				error = append(error, err.Field()+": must be less than or equals to "+model.LteMonth+" ")
-			case "numeric":
-				error = append(error, err.Field()+": must be only numbers")
-			case "len=11|len=14":
-				error = append(error, err.Field()+": must have "+model.GteDocument+" or "+model.LteDocument+" digits")
-			}
-		}
-	} else {
-		var dErr string
-		if len(invoice.Document) == 11 {
-			dErr = v.ValidateCPF(invoice.Document)
-		} else {
-			dErr = v.ValidateCNPJ(invoice.Document)
-		}
-		if len(dErr) > 0 {
-			error = append(error, "Document: "+dErr)
-		}
-	}
-	return error
-}
-
 func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	validate = validator.New()
 	w.Header().Set("Content-Type", "application/json")
 	amount, err1 := strconv.ParseFloat(r.FormValue("amount"), 64)
 	document := r.FormValue("document")
 	month, err2 := strconv.Atoi(r.FormValue("month"))
 	year, err3 := strconv.Atoi(r.FormValue("year"))
 	invoice := model.Invoice{Amount: amount, Document: document, Month: month, Year: year, Is_active: true}
-	vErr := ValidateInvoice(invoice)
+	vErr := v.ValidateInvoice(invoice)
 	var jData []byte
 	if err1 != nil || err2 != nil || err3 != nil {
 		response := &errorInvoice{

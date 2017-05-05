@@ -1,9 +1,15 @@
 package validate
 
 import (
+	"app/model"
+	"errors"
 	"strconv"
 	"strings"
+
+	validator "gopkg.in/go-playground/validator.v9"
 )
+
+var validate *validator.Validate
 
 func ValidateCPF(document string) string {
 	doc := strings.Split(document, "")
@@ -59,4 +65,78 @@ func calculateDigit(doc string, positions int) string {
 		return "0"
 	}
 	return strconv.FormatInt(int64(11-sum), 10)
+}
+
+func ValidateInvoice(invoice model.Invoice) []string {
+	validate = validator.New()
+	error := []string{}
+	Err := validate.Struct(invoice)
+	if Err != nil {
+		for _, err := range Err.(validator.ValidationErrors) {
+			switch tag := err.Tag(); tag {
+			case "required":
+				error = append(error, err.Field()+": is required ")
+			case "gte":
+				var gte string
+				switch field := err.Field(); field {
+				case "Amount":
+					gte = model.GteAmount
+				case "Month":
+					gte = model.GteMonth
+				}
+				error = append(error, err.Field()+": must be greater than or equals to "+gte+" ")
+			case "gt":
+				error = append(error, err.Field()+": must be greater than "+model.GtYear+" ")
+			case "lte":
+				error = append(error, err.Field()+": must be less than or equals to "+model.LteMonth+" ")
+			case "numeric":
+				error = append(error, err.Field()+": must be only numbers")
+			case "len=11|len=14":
+				error = append(error, err.Field()+": must have "+model.GteDocument+" or "+model.LteDocument+" digits")
+			}
+		}
+	} else {
+		var dErr string
+		if len(invoice.Document) == 11 {
+			dErr = ValidateCPF(invoice.Document)
+		} else {
+			dErr = ValidateCNPJ(invoice.Document)
+		}
+		if len(dErr) > 0 {
+			error = append(error, "Document: "+dErr)
+		}
+	}
+	return error
+}
+
+func ValidateUser(user model.User) error {
+	validate = validator.New()
+	var error string
+	vErr := validate.Struct(user)
+	if vErr != nil {
+		for _, err := range vErr.(validator.ValidationErrors) {
+			if len(error) > 0 {
+				error += ", "
+			}
+			if err.Tag() == "required" {
+				error += err.Field() + ": is required "
+			}
+			if err.Tag() == "alphanum" || err.Tag() == "excludesall" {
+				error += err.Field() + ": contains invalid characters "
+			}
+			if err.Tag() == "gt" {
+				var gt string
+				if err.Field() == "Name" {
+					gt = model.GtName
+				} else {
+					gt = model.GtPassword
+				}
+				error += err.Field() + ": must have more than " + gt + " characters"
+			}
+		}
+		rErr := errors.New(error)
+		return rErr
+	} else {
+		return nil
+	}
 }
