@@ -22,7 +22,7 @@ type errorInvoice struct {
 	Invoice []model.Invoice `json:"payload"`
 }
 
-func validateInvoice(invoice model.Invoice) []string {
+func ValidateInvoice(invoice model.Invoice) []string {
 	error := []string{}
 	Err := validate.Struct(invoice)
 	if Err != nil {
@@ -71,7 +71,7 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	month, err2 := strconv.Atoi(r.FormValue("month"))
 	year, err3 := strconv.Atoi(r.FormValue("year"))
 	invoice := model.Invoice{Amount: amount, Document: document, Month: month, Year: year, Is_active: true}
-	vErr := validateInvoice(invoice)
+	vErr := ValidateInvoice(invoice)
 	var jData []byte
 	if err1 != nil || err2 != nil || err3 != nil {
 		response := &errorInvoice{

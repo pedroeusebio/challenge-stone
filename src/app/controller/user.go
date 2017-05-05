@@ -23,12 +23,14 @@ type errorUser struct {
 
 var validate *validator.Validate
 
-func validateUser(user model.User) error {
+func ValidateUser(user model.User) error {
 	var error string
 	vErr := validate.Struct(user)
 	if vErr != nil {
 		for _, err := range vErr.(validator.ValidationErrors) {
-			error += ", "
+			if len(error) > 0 {
+				error += ", "
+			}
 			if err.Tag() == "required" {
 				error += err.Field() + ": is required "
 			}
@@ -57,7 +59,7 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	name, password := r.FormValue("name"), r.FormValue("password")
 	user := model.User{name, password}
-	vErr := validateUser(user)
+	vErr := ValidateUser(user)
 	var jData []byte
 	if vErr != nil {
 		e := vErr.Error()
