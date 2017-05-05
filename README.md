@@ -6,7 +6,7 @@
 - [Instalação](https://github.com/pedroeusebio/challenge-stone#instalação)
 - [Bibliotecas](https://github.com/pedroeusebio/challenge-stone#bibliotecas)
 - [Documentação da API](https://github.com/pedroeusebio/challenge-stone#documentação-da-api)
-- [Referências](https://github.com/pedroeusebio/challenge-stone#referencias) 
+- [Referências](https://github.com/pedroeusebio/challenge-stone#referências) 
 
 ## Instalação 
 
@@ -24,6 +24,7 @@ O proximo passo é configurar o docker para ter disponível o banco postgres con
     docker run -dt -p 5432:5432 --rm -v pgdata:/var/lib/postgresql/data <nome_desejado> 
 ```
 Esse último comando serve para subir o banco sem travar o terminal (-dt) e fazendo um *forward* da porta 5432 local para a 5432 da maquina virtual do docker. Então caso a porta já esteja sendo utilizada, só alterar para a porta desejada.
+Será necessário também alterar o arquivo  de configuração [./config/config.json](https://github.com/pedroeusebio/challenge-stone/blob/master/config/config.json) usado pela aplicação para acessar o banco de dados. 
 
 A API foi desenvolvida utilizando o [glide](https://github.com/Masterminds/glide) como *Package Management*, dessa forma, basta utilizar os comando abaixo para obter as *libs* de acordo com a versão determinada no arquivo .yaml: 
 ```shell
@@ -40,14 +41,16 @@ Tendo o $GOPATH configurado para rodar a aplicação basta usar o comando:
 ```shell
     go run src/challengestone.go
 ```
+OBS1: Caso queira altera a porta em que o servidor esta rodando acesso o arquivo [./config/config.json](https://github.com/pedroeusebio/challenge-stone/blob/master/config/config.json) e altere o `HTTPPort` dentro do objeto `Server`.
 
+OBS2: O SQL usado para criar a estrutura do banco de dados é [./config/postgres.sql](https://github.com/pedroeusebio/challenge-stone/blob/master/config/postgres.sql)
 ## Bibliotecas
 
 Segue abaixo a lista de bibliotecas utilizadas e a justificativa para a sua utilização.
 1. [Squirrel](https://github.com/Masterminds/squirrel)
     - Squirrel é uma lib que facilita a criação das Queries em SQL, dessa forma se fez extremamente necessario para trabalhar com o banco de dados de maneira mais rapida e facil.
 2. [Sqlx](https://github.com/jmoiron/sqlx)
-    - escrever alguma coisa
+    - Biblioteca usada para gerenciar a conexão com o banco de dados
 3. [Httprouter](https://github.com/julienschmidt/httprouter)
     - Usado para gerenciar as rotas da API com mais facildade que o net/http. 
 4. [PQ](https://github.com/lib/pq)
@@ -109,3 +112,12 @@ Obs: Os métodos de inserção e remoção são necessários a autenticação do
 
 A operação de *login* é feita de através da url `/login` utilizando um metodo POST. É necessário o envio do *name* e *password* do usuário que deseja autenticar. Caso o usuário não exista ou a senha esteja incorreta, é retornado um json com a mensagem de erro e o token vazio. Caso o usuário consiga autenticar com sucesso, é gerado um JWT feita da composição do *name* e do *password* do usuário, com uma validade de 10 anos, dessa forma, é enviado como resposta um json contendo a mensagem de sucesso e token gerado. Para poder utilizar esse *token* para a validação do usuário é necessário adicionar a *header* `X-Token` no cabeçalho do protocolo HTTP que enviará o pedido.
 
+## Referências
+
+Aqui estão listados as referências usadas para o desenvolvimento do sistema:
+
+- [astaxie/build-web-application-with-golang](https://github.com/astaxie/build-web-application-with-golang)
+- [go-playground/validator](https://github.com/go-playground/validator)
+- [josephspurrier/gowebapp](https://github.com/josephspurrier/gowebapp)
+- [avelino/awesome-go](https://github.com/avelino/awesome-go)
+- [karlseguin/the-little-go-book](https://github.com/karlseguin/the-little-go-book)
