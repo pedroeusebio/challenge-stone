@@ -9,15 +9,20 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+// constantes para mensagem de erro na validacao
 const (
 	GtName     = "6"
 	GtPassword = "6"
 )
 
+// struct do usuario
 type User struct {
 	Name     string `db:"name" validate:"required,alphanum,gt=6" json:"name"`
 	Password string `db:"password" validate:"required,gt=6,excludesall= \n\t" json:"password"`
 }
+
+// funcao que adiciona o usuario no banco
+// caso ocorra algum erro ele retorna uma mensagem
 
 func UserCreate(name string, password string) error {
 	var err error
@@ -27,6 +32,11 @@ func UserCreate(name string, password string) error {
 	_, err = database.SQL.Exec(query, name, password)
 	return err
 }
+
+// funcao que busca o array de usuarios pela
+// recebe parametros de order, page, length e name para filtrar os dados
+// a query é feita deinamicamente de acordo com os dados inseridos
+// retorna uma lista de usuarios e uma mensagem de erro caso tenha
 
 func UserGetAll(orders []ordenate.Ordenate, page string, length string, name string) ([]User, error) {
 	users := []User{}
@@ -62,6 +72,9 @@ func UserGetAll(orders []ordenate.Ordenate, page string, length string, name str
 		return users, nil
 	}
 }
+
+// funcao que realiza a busca do usuário pelo name
+// usada para a validacao e autenticacao
 
 func UserByName(name string) (User, error) {
 	user := User{}

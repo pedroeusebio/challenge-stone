@@ -12,16 +12,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// struct para gerar a hash do JWT
 type Claims struct {
 	User model.User `json:"user"`
 	jwt.StandardClaims
 }
 
+// struct de resposta de sucessso
 type successLogin struct {
 	Success string `json:"success"`
 	Token   string `json:"token"`
 }
 
+// struct de resposta de fracasso
 type errorLogin struct {
 	Error string `json:"error"`
 	Token string `json:"token"`
@@ -30,6 +33,11 @@ type errorLogin struct {
 const (
 	mySigningKey = "WOW,MuchShibe,ToDogge"
 )
+
+// handler de autenticacao do usuario
+// compara a senha inserida com a senha do banco
+// verifica se o usuario existe no banco
+// retorna o hash de autenticacao ou um mensagem de erro
 
 func AuthPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
@@ -68,6 +76,10 @@ func AuthPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	w.Write(jData)
 }
+
+// middleware de validacao simples para o JWT
+// verifica a validade do token armazenado no cabecalho
+// retorna erro ou deixa o usuario acessar a url desejada
 
 func Validate(protectedPage httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {

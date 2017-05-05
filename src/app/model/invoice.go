@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+// constantes para retornar mensagem de erro na validacao
 const (
 	GteAmount   = "0"
 	GteMonth    = "1"
@@ -17,6 +18,7 @@ const (
 	LteDocument = "14"
 )
 
+//struct do invoice
 type Invoice struct {
 	Id        string  `db:"id" json:"id"`
 	Amount    float64 `db:"amount" validate:"gte=0" json:"amount"`
@@ -26,6 +28,9 @@ type Invoice struct {
 	Is_active bool    `db:"is_active" validate:"required" json:"is_active"`
 }
 
+// funcao para adicionar o invoice no banco de dados
+// retorna erro ou nil caso nao exista nenhum erro
+
 func InvoiceCreate(amount float64, document string, month int, year int) error {
 	var err error
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
@@ -34,6 +39,9 @@ func InvoiceCreate(amount float64, document string, month int, year int) error {
 	_, err = database.SQL.Exec(query, amount, document, month, year, true)
 	return err
 }
+
+// funcao que retornar um array de invoice e erro caso ocorra.
+// a query é feita dinamicamente de acordo com os parametros passados
 
 func InvoiceGetAll(orders []ordenate.Ordenate, page string, length string) ([]Invoice, error) {
 	invoices := []Invoice{}
@@ -62,6 +70,10 @@ func InvoiceGetAll(orders []ordenate.Ordenate, page string, length string) ([]In
 		return invoices, nil
 	}
 }
+
+// funcao de remocao logica dos invoice
+// verifica a existencia do dado no banco e retorna erro caso nao exista
+// sucesso : retorna o invoice deletado e nil
 
 func InvoiceDelete(id string) (Invoice, error) {
 	var err error

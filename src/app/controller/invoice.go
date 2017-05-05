@@ -11,15 +11,21 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// struct de resposta de sucesso
 type successInvoice struct {
 	Success []string        `json:"success"`
 	Invoice []model.Invoice `json:"payload"`
 }
 
+// struct de resposta de erro
 type errorInvoice struct {
 	Err     []string        `json:"error"`
 	Invoice []model.Invoice `json:"payload"`
 }
+
+// handler de criacao do invoice.
+// os dados são validados e salvos no banco.
+// retorna um json com mensagem de sucesso ou erro e um payload dos dados do invoice
 
 func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
@@ -58,6 +64,9 @@ func InvoicePOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Write(jData)
 }
 
+// handler da listagem do invoice.
+// realiza a busca no banco e retorna um array de invoices ou um array vazio e uma mensagem de erro.
+
 func InvoiceGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	orderBy, page, length := r.FormValue("order"), r.FormValue("page"), r.FormValue("length")
@@ -89,6 +98,9 @@ func InvoiceGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Write(jData)
 }
 
+// handler da remocao do invoice_.
+// recebe o id do invoice e o remove do banco
+// retorna sucesso e o invoice removido ou uma mensagem de erro e um invoice vazio.
 func InvoiceDEL(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	id := params.ByName("id")

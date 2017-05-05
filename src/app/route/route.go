@@ -13,14 +13,15 @@ func LoadHTTP() http.Handler {
 
 func routes() *httprouter.Router {
 	r := httprouter.New()
-
-	r.POST("/user", controller.UserPOST)
+	// rotas do user
 	r.GET("/user", controller.UserGET)
-
-	r.POST("/invoice", controller.Validate(controller.InvoicePOST))
-	r.GET("/invoice", controller.InvoiceGET)
+	r.POST("/user", controller.UserPOST)
+	// rotas do invoice
+	// controller.Validate aplica a restricao da rota para somente os autenticados
 	r.DELETE("/invoice/:id", controller.Validate(controller.InvoiceDEL))
-
+	r.GET("/invoice", controller.InvoiceGET)
+	r.POST("/invoice", controller.Validate(controller.InvoicePOST))
+	// rota de login
 	r.POST("/login", controller.AuthPOST)
 	return r
 }

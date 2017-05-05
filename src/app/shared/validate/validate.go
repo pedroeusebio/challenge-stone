@@ -11,6 +11,9 @@ import (
 
 var validate *validator.Validate
 
+// funcao de validacao do CPF
+// retorna um string de CPF invalido caso o cpf nao seja valido
+
 func ValidateCPF(document string) string {
 	doc := strings.Split(document, "")
 	d1, _ := strconv.Atoi(doc[9])
@@ -31,6 +34,8 @@ func ValidateCPF(document string) string {
 		return "CPF invalid"
 	}
 }
+
+// funcao de validacao do CNPJ
 
 func ValidateCNPJ(document string) string {
 	doc := document
@@ -66,6 +71,10 @@ func calculateDigit(doc string, positions int) string {
 	}
 	return strconv.FormatInt(int64(11-sum), 10)
 }
+
+// funcao de validacao dos dados do invoice
+// foi utilizado o validator.v9 para facilitar a validacao
+// funcao feita para retornar a mensagem de erro compeensivel ao usuario
 
 func ValidateInvoice(invoice model.Invoice) []string {
 	validate = validator.New()
@@ -108,6 +117,10 @@ func ValidateInvoice(invoice model.Invoice) []string {
 	}
 	return error
 }
+
+// funcao de validacao dos dados do user
+// foi utilizado o validator.v9 para facilitar a validacao
+// funcao feita para retornar a mensagem de erro compeensivel ao usuario
 
 func ValidateUser(user model.User) error {
 	validate = validator.New()

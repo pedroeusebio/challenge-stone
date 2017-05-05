@@ -10,15 +10,21 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+//struct de resposta de sucesso
 type successUser struct {
 	Success string       `json:"success"`
 	User    []model.User `json:"payload"`
 }
 
+// struct de resposta de erro
 type errorUser struct {
 	Err  string       `json:"error"`
 	User []model.User `json:"payload"`
 }
+
+// handler da criacao do usuário
+// é feita a validacao dos dados e o usuário é salvo no banco de dados
+// a funcao retorna um json com uma mensagem de sucesso ou erro mais um payload com os dados do usuário
 
 func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
@@ -49,6 +55,10 @@ func UserPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	w.Write(jData)
 }
+
+// handler da listagem dos usuários
+// retorna um array de usuarios ou um array vazio e uma mensagem de erro, caso ao contrario
+// recebe os parametros roder, page, length e name que podem alterar o resutado da listagem
 
 func UserGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")

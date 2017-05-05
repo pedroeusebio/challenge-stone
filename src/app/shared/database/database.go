@@ -12,6 +12,7 @@ var (
 	SQL      *sqlx.DB
 )
 
+// struct de configuracao do banco de dados
 type Database struct {
 	Username  string
 	Password  string
@@ -21,9 +22,13 @@ type Database struct {
 	Parameter string
 }
 
+// funcao para a formacao da string de conexao do banco
+
 func stringConnect(db Database) string {
 	return "postgres://" + db.Username + ":" + db.Password + "@" + db.Hostname + ":" + db.Port + "/" + db.Dbname + db.Parameter
 }
+
+// funcao para conectar ao banco de dados
 
 func Connect(db Database) {
 	var err error
@@ -37,6 +42,8 @@ func Connect(db Database) {
 		log.Println("Database Error", err)
 	}
 }
+
+// funcao para retornar os dados usados no banco de dados
 
 func readConfig() Database {
 	return database
